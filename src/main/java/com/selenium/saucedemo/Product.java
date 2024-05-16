@@ -1,19 +1,17 @@
 package com.selenium.saucedemo;
 
 import com.selenium.base.BaseComponent;
-import com.selenium.base.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 
 public class Product extends BaseComponent {
 
     private String name;
     private BigDecimal price;
+
 
     public Product(WebElement element) {
         super(element);
@@ -36,7 +34,11 @@ public class Product extends BaseComponent {
         return price; // Sanitation and formatting
     }
 
-    public void addToCart() {
+    public void addRemoveFromCart() {
         root.findElement(By.tagName("button")).click();
+    }
+
+    public WebElement getProductBtn() {
+        return root.findElement(By.tagName("button"));
     }
 }

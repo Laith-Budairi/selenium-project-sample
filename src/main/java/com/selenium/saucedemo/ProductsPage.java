@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -16,8 +18,12 @@ public class ProductsPage extends BasePage {
     @FindBy(css = "span.title")
     private WebElement messageTxt;
 
+    @FindBy(className = "product_sort_container")
+    private WebElement productSortDropDown;
+
     public ProductsPage(WebDriver driver) {
         super(driver);
+        PageFactory.initElements(driver, this);
     }
 
     public List<Product> getProducts() {
@@ -29,7 +35,7 @@ public class ProductsPage extends BasePage {
 
 
     public String getMessageTxt() {
-        return driver.findElement(By.cssSelector("span.title")).getText();
+        return messageTxt.getText();
     }
 
     public Product getProduct(Predicate<Product> condition) {
@@ -43,5 +49,28 @@ public class ProductsPage extends BasePage {
     public CartPage navigateToCart() {
         driver.findElement(By.className("shopping_cart_link")).click();
         return new CartPage(driver);
+    }
+
+    public void sort(SortProductBy sortType) {
+        Select dropdown = new Select(productSortDropDown);
+
+        switch (sortType) {
+            case A_Z:
+                dropdown.selectByValue("az");
+                break;
+            case Z_A:
+                dropdown.selectByValue("za");
+                break;
+            case LOW_HIGH:
+                dropdown.selectByValue("lohi");
+                break;
+            case HIGH_LOW:
+                dropdown.selectByValue("hilo");
+                break;
+            default:
+//                throw new Exception("Invalid sort option: " + sortType);
+        }
+
+
     }
 }

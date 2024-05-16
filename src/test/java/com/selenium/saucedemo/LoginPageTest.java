@@ -1,53 +1,52 @@
 package com.selenium.saucedemo;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import com.selenium.BrowserType;
+import com.selenium.WebDriverFactory;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LoginPageTest {
 
-    static int browser = 0;
-    WebDriver driver;
-    static ChromeOptions options;
+    static WebDriver driver;
     static String url;
 
     @BeforeAll
-    public static void setUp() throws Exception {
+    public static void setUp() {
         url = "https://www.saucedemo.com/";
-        if(browser == 0) {
-            options = new ChromeOptions();
-            options.addArguments("--remote-allow-origins=*");
-            WebDriverManager.chromedriver().setup();
-        }
-
     }
 
     @BeforeEach
     public void init() {
-        if(browser == 0)
-            driver = new ChromeDriver(options);
+        driver = WebDriverFactory.createWebDriver(BrowserType.CHROME);
         driver.get(url);
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         driver.quit();
     }
 
 
     @Test
-    public void testLogin() throws InterruptedException {
+    public void testValidLogin() {
         LoginPage loginPage = new LoginPage(driver);
         ProductsPage productsPage = loginPage.validLogin("standard_user", "secret_sauce");
+
+        assertNotEquals("https://www.saucedemo.com/", driver.getCurrentUrl());
         assertEquals(productsPage.getMessageTxt(), "Products");
+    }
+
+    @Test
+    public void testLockedOutUserLogin() {
+        LoginPage loginPage = new LoginPage(driver);
+        String errorMsg = loginPage.invalidLogin("locked_out_user", "secret_sauce");
+
+        assertTrue(errorMsg.contains("user has been locked out"));
+        assertEquals("https://www.saucedemo.com/", driver.getCurrentUrl());
     }
 }
